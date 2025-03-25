@@ -1,8 +1,6 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/ui/button";
+import { Progress } from "@/ui/progress";
 import {
   Card,
   CardContent,
@@ -10,20 +8,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "@/ui/card";
+import { Badge } from "@/ui/badge";
 import { Shield, Sword, Heart, Hand, Scissors, Scroll } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { StickFigure } from "@/components/stick-figure";
-import { useSocket } from "@/hooks/use-socket";
+import { StickFigure } from "@/stick-figure";
+import { useSocket } from "@/use-socket";
 
 // Attack and defense types
 type MoveType = "rock" | "paper" | "scissors";
-
-// Effectiveness multipliers
-const SUPER_EFFECTIVE = 2.0;
-const NORMAL_EFFECTIVE = 1.0;
-const NOT_EFFECTIVE = 0.5;
 
 type Fighter = {
   id: string;
