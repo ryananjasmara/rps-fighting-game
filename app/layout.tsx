@@ -1,19 +1,20 @@
-import type React from "react"
-import "./globals.css"
-import { Inter } from "next/font/google"
-import { SocketProvider } from "@/hooks/use-socket"
+import type React from "react";
+import "./globals.css";
+import { Inter } from "next/font/google";
+import { SocketProvider } from "@/use-socket";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Multiplayer Rock-Paper-Scissors Fighting Game",
-  description: "A real-time multiplayer fighting game with rock-paper-scissors mechanics",
-}
+  description:
+    "A real-time multiplayer fighting game with rock-paper-scissors mechanics",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -21,6 +22,5 @@ export default function RootLayout({
         <SocketProvider>{children}</SocketProvider>
       </body>
     </html>
-  )
+  );
 }
-

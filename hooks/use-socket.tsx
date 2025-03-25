@@ -19,8 +19,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Tambahkan logging untuk debugging
-
   useEffect(() => {
     // Gunakan URL socket server eksternal
     // Pastikan ini mengarah ke socket server yang sudah Anda jalankan
