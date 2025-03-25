@@ -78,6 +78,8 @@ export default function FightingGame() {
     setGameState("lobby");
     setGameId(null);
     setError(null); // Reset error juga
+    setPlayerId("");
+    setPlayerName("");
   };
 
   return (
