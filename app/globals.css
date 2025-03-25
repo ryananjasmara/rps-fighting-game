@@ -24,6 +24,11 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
   }
 
   .dark {
@@ -46,6 +51,11 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -53,16 +63,19 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @keyframes shake {
+
   0%,
   100% {
     transform: translateX(0);
   }
+
   10%,
   30%,
   50%,
@@ -70,6 +83,7 @@
   90% {
     transform: translateX(-5px);
   }
+
   20%,
   40%,
   60%,
@@ -86,9 +100,11 @@
   0% {
     transform: translateX(0);
   }
+
   50% {
     transform: translateX(15px);
   }
+
   100% {
     transform: translateX(0);
   }
@@ -102,9 +118,11 @@
   0% {
     transform: translateX(0) rotate(0deg);
   }
+
   50% {
     transform: translateX(10px) rotate(10deg);
   }
+
   100% {
     transform: translateX(0) rotate(0deg);
   }
@@ -118,12 +136,15 @@
   0% {
     transform: translateX(0) rotate(0deg);
   }
+
   25% {
     transform: translateX(5px) rotate(-10deg);
   }
+
   75% {
     transform: translateX(10px) rotate(10deg);
   }
+
   100% {
     transform: translateX(0) rotate(0deg);
   }
@@ -137,9 +158,11 @@
   0% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 0.8;
   }
+
   100% {
     opacity: 0.3;
   }
@@ -154,10 +177,12 @@
     opacity: 0;
     transform: scale(0);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.5);
   }
+
   100% {
     opacity: 0;
     transform: scale(0);
@@ -173,10 +198,12 @@
     opacity: 0;
     transform: translateY(5px);
   }
+
   50% {
     opacity: 1;
     transform: translateY(-5px);
   }
+
   100% {
     opacity: 0;
     transform: translateY(5px);
@@ -186,4 +213,3 @@
 .animate-victory {
   animation: victory 1s infinite;
 }
-
