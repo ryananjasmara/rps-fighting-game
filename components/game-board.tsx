@@ -9,11 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@components/ui/card";
-import { Badge } from "@components/ui/badge";
 import { Shield, Sword, Heart, Hand, Scissors, Scroll } from "lucide-react";
 import { cn } from "@components/lib/utils";
 import { StickFigure } from "@components/stick-figure";
 import { useSocket } from "@hooks/use-socket";
+import capitalize from "@utils/capitalize";
+import { HowToPlayModal } from "@components/how-to-play-modal";
 
 // Attack and defense types
 type MoveType = "rock" | "paper" | "scissors";
@@ -280,381 +281,351 @@ export function GameBoard({
   };
 
   return (
-    <div className="grid gap-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">{getTurnStatusText()}</h2>
-        <Button variant="outline" onClick={onExitGame}>
-          Exit Game
-        </Button>
-      </div>
-
-      {/* Battle Arena */}
-      <div className="relative h-64 bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl overflow-hidden border">
-        <div className="absolute inset-0 flex items-center justify-between px-12">
-          {/* Player Stick Figure */}
-          <div className="flex flex-col items-center">
-            <StickFigure
-              action={playerAction}
-              moveType={player?.currentAttackType || localMoveType || "rock"}
-              color="blue"
-              flipped={false}
-              className="h-40 w-40"
-            />
-            <div className="mt-2 w-32">
-              <Progress
-                value={
-                  ((player?.health || 0) / (player?.maxHealth || 100)) * 100
-                }
-                className="h-2"
-              />
-              <p className="text-xs text-center mt-1">
-                {player?.health || 0}/{player?.maxHealth || 100}
-              </p>
-              {player?.currentAttackType && (
-                <div className="flex justify-center mt-1">
-                  <Badge variant="outline" className="text-xs">
-                    {getMoveTypeIcon(player.currentAttackType)}
-                    {player.currentAttackType}
-                  </Badge>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Effectiveness Indicator */}
-          {effectiveness && (
-            <div
-              className={cn(
-                "absolute top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-white font-bold",
-                effectiveness === "super"
-                  ? "bg-green-500"
-                  : effectiveness === "normal"
-                  ? "bg-blue-500"
-                  : "bg-red-500"
-              )}
-            >
-              {effectiveness === "super"
-                ? "Super Effective!"
-                : effectiveness === "normal"
-                ? "Normal Effectiveness"
-                : "Not Very Effective..."}
-            </div>
-          )}
-
-          {/* VS */}
-          <div className="text-4xl font-bold opacity-20">VS</div>
-
-          {/* Opponent Stick Figure */}
-          <div className="flex flex-col items-center">
-            <StickFigure
-              action={opponentAction}
-              moveType={opponent?.currentAttackType || "rock"}
-              color="red"
-              flipped={true}
-              className="h-40 w-40"
-            />
-            <div className="mt-2 w-32">
-              <Progress
-                value={
-                  ((opponent?.health || 0) / (opponent?.maxHealth || 100)) * 100
-                }
-                className="h-2"
-              />
-              <p className="text-xs text-center mt-1">
-                {opponent?.health || 0}/{opponent?.maxHealth || 100}
-              </p>
-              {opponent?.currentAttackType && (
-                <div className="flex justify-center mt-1">
-                  <Badge variant="outline" className="text-xs">
-                    {getMoveTypeIcon(opponent.currentAttackType)}
-                    {opponent.currentAttackType}
-                  </Badge>
-                </div>
-              )}
-            </div>
-          </div>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Game Room: {gameId}</h1>
+        <div className="space-x-2 flex items-center gap-2">
+          <HowToPlayModal />
+          <Button variant="destructive" size="sm" onClick={onExitGame}>
+            Exit Game
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Player Card */}
-        <Card
-          className={cn(
-            "relative overflow-hidden",
-            attackAnimation === opponent?.id && "animate-shake"
-          )}
-        >
-          <CardHeader className="bg-primary/10">
-            <CardTitle className="flex justify-between items-center">
-              <span>{player?.name || playerName} (You)</span>
-              <Heart className="h-5 w-5 text-red-500" />
-            </CardTitle>
-            <CardDescription>
-              <div className="flex items-center gap-2 mt-2">
+      <div className="grid gap-8">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">{getTurnStatusText()}</h2>
+        </div>
+
+        {/* Battle Arena */}
+        <div className="relative h-64 bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl overflow-hidden border">
+          <div className="absolute inset-0 flex items-center justify-between px-12">
+            {/* Player Stick Figure */}
+            <div className="flex flex-col items-center">
+              <StickFigure
+                action={playerAction}
+                moveType={player?.currentAttackType || localMoveType || "rock"}
+                color="blue"
+                flipped={false}
+                className="h-40 w-40"
+              />
+              <div className="mt-2 w-32">
                 <Progress
                   value={
                     ((player?.health || 0) / (player?.maxHealth || 100)) * 100
                   }
-                  className="h-4"
+                  className="h-2"
                 />
-                <span className="text-sm font-medium">
+                <p className="text-xs text-center mt-1">
                   {player?.health || 0}/{player?.maxHealth || 100}
-                </span>
+                </p>
               </div>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-2">
-                <Sword className="h-5 w-5 text-orange-500" />
-                <span>Attack: {player?.attack || 15}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-500" />
-                <span>Defense: {player?.defense || 5}</span>
-              </div>
-              {player?.currentAttackType && (
-                <div className="flex items-center gap-2">
-                  {getMoveTypeIcon(player.currentAttackType)}
-                  <span>Last Attack: {player.currentAttackType}</span>
-                </div>
-              )}
-              {player?.currentDefenseType && (
-                <div className="flex items-center gap-2">
-                  {getMoveTypeIcon(player.currentDefenseType)}
-                  <span>Last Defense: {player.currentDefenseType}</span>
-                </div>
-              )}
             </div>
-          </CardContent>
-          <div
-            className={cn(
-              "absolute inset-0 bg-red-500/20 pointer-events-none opacity-0",
-              attackAnimation === opponent?.id && "opacity-100"
-            )}
-          />
-        </Card>
 
-        {/* Opponent Card */}
-        <Card
-          className={cn(
-            "relative overflow-hidden",
-            attackAnimation === playerId && "animate-shake"
-          )}
-        >
-          <CardHeader className="bg-destructive/10">
-            <CardTitle className="flex justify-between items-center">
-              <span>{opponent?.name || "Opponent"}</span>
-              <Heart className="h-5 w-5 text-red-500" />
-            </CardTitle>
-            <CardDescription>
-              <div className="flex items-center gap-2 mt-2">
+            {/* Effectiveness Indicator */}
+            {effectiveness && (
+              <div
+                className={cn(
+                  "absolute top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-white font-bold",
+                  effectiveness === "super"
+                    ? "bg-green-500"
+                    : effectiveness === "normal"
+                    ? "bg-blue-500"
+                    : "bg-red-500"
+                )}
+              >
+                {effectiveness === "super"
+                  ? "Super Effective!"
+                  : effectiveness === "normal"
+                  ? "Normal Effectiveness"
+                  : "Not Very Effective..."}
+              </div>
+            )}
+
+            {/* VS */}
+            <div className="text-4xl font-bold opacity-20">VS</div>
+
+            {/* Opponent Stick Figure */}
+            <div className="flex flex-col items-center">
+              <StickFigure
+                action={opponentAction}
+                moveType={opponent?.currentAttackType || "rock"}
+                color="red"
+                flipped={true}
+                className="h-40 w-40"
+              />
+              <div className="mt-2 w-32">
                 <Progress
                   value={
                     ((opponent?.health || 0) / (opponent?.maxHealth || 100)) *
                     100
                   }
-                  className="h-4"
+                  className="h-2"
                 />
-                <span className="text-sm font-medium">
+                <p className="text-xs text-center mt-1">
                   {opponent?.health || 0}/{opponent?.maxHealth || 100}
-                </span>
-              </div>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-2">
-                <Sword className="h-5 w-5 text-orange-500" />
-                <span>Attack: {opponent?.attack || 15}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-500" />
-                <span>Defense: {opponent?.defense || 5}</span>
-              </div>
-              {opponent?.currentAttackType && (
-                <div className="flex items-center gap-2">
-                  {getMoveTypeIcon(opponent.currentAttackType)}
-                  <span>Last Attack: {opponent.currentAttackType}</span>
-                </div>
-              )}
-              {opponent?.currentDefenseType && (
-                <div className="flex items-center gap-2">
-                  {getMoveTypeIcon(opponent.currentDefenseType)}
-                  <span>Last Defense: {opponent.currentDefenseType}</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-          <div
-            className={cn(
-              "absolute inset-0 bg-red-500/20 pointer-events-none opacity-0",
-              attackAnimation === playerId && "opacity-100"
-            )}
-          />
-        </Card>
-      </div>
-
-      {/* Selection Phase UI - Modified to show only attack or defense */}
-      {gameState.phase === "selection" && isPlayerTurn && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>
-              {gameState.currentTurnType === "attack"
-                ? "Choose Your Attack"
-                : "Choose Your Defense"}
-            </CardTitle>
-            <CardDescription>
-              {gameState.currentTurnType === "attack"
-                ? "Rock beats Scissors, Scissors beats Paper, Paper beats Rock"
-                : `Defend against opponent's ${gameState.pendingAttack?.attackType} attack`}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <h3 className="font-medium mb-3">
-                {gameState.currentTurnType === "attack"
-                  ? "Attack Type:"
-                  : "Defense Type:"}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={localMoveType === "rock" ? "default" : "outline"}
-                  onClick={() => handleMoveSelect("rock")}
-                  className="flex items-center gap-2"
-                >
-                  <Hand className="h-5 w-5" />
-                  Rock
-                </Button>
-                <Button
-                  variant={localMoveType === "paper" ? "default" : "outline"}
-                  onClick={() => handleMoveSelect("paper")}
-                  className="flex items-center gap-2"
-                >
-                  <Scroll className="h-5 w-5" />
-                  Paper
-                </Button>
-                <Button
-                  variant={localMoveType === "scissors" ? "default" : "outline"}
-                  onClick={() => handleMoveSelect("scissors")}
-                  className="flex items-center gap-2"
-                >
-                  <Scissors className="h-5 w-5" />
-                  Scissors
-                </Button>
-              </div>
-            </div>
-
-            <Button
-              className="w-full mt-6"
-              disabled={!localMoveType}
-              onClick={handleConfirmMove}
-            >
-              Confirm{" "}
-              {gameState.currentTurnType === "attack" ? "Attack" : "Defense"}
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Waiting for opponent's move */}
-      {gameState.phase === "selection" && !isPlayerTurn && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Waiting for Opponent</CardTitle>
-            <CardDescription>
-              {gameState.currentTurnType === "attack"
-                ? `${opponent?.name || "Opponent"} is choosing their attack`
-                : `${
-                    opponent?.name || "Opponent"
-                  } is choosing their defense against your ${
-                    gameState.pendingAttack?.attackType || ""
-                  } attack`}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center py-8">
-              <div className="flex flex-col items-center gap-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p>
-                  {gameState.currentTurnType === "attack"
-                    ? "Get ready to defend once they choose their attack..."
-                    : "Waiting for opponent to choose their defense..."}
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Game Status */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>
-            {gameState.phase === "game_over"
-              ? `Game Over! ${
-                  gameState.winner === playerId ? "You Won!" : "You Lost!"
-                }`
-              : gameState.phase === "selection"
-              ? "Selection Phase"
-              : "Battle Phase"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-40 overflow-y-auto border rounded-md p-4">
-            {gameState.gameLog.map((log, index) => (
-              <p key={index} className="mb-1">
-                {log}
-              </p>
-            ))}
           </div>
-        </CardContent>
-        <CardFooter>
-          {gameState.phase === "game_over" && (
-            <Button onClick={onExitGame} variant="secondary" className="w-full">
-              Return to Lobby
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
+        </div>
 
-      {/* Game Instructions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>How to Play</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Players take turns attacking and defending.</li>
-            <li>When it's your turn to attack, choose your attack type.</li>
-            <li>
-              When it's your turn to defend, choose your defense type against
-              the opponent's attack.
-            </li>
-            <li>
-              Rock beats Scissors, Scissors beats Paper, Paper beats Rock.
-            </li>
-            <li>
-              Attack effectiveness depends on the defender's defense type:
-              <ul className="list-circle pl-5 mt-1">
-                <li>
-                  Super Effective (2x damage): Your attack type beats their
-                  defense type
-                </li>
-                <li>
-                  Normal Effective (1x damage): Your attack type matches their
-                  defense type
-                </li>
-                <li>
-                  Not Very Effective (0.5x damage): Your attack type is weak
-                  against their defense type
-                </li>
-              </ul>
-            </li>
-            <li>Reduce your opponent's health to zero to win!</li>
-          </ul>
-        </CardContent>
-      </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Player Card */}
+          <Card
+            className={cn(
+              "relative overflow-hidden",
+              attackAnimation === opponent?.id && "animate-shake"
+            )}
+          >
+            <CardHeader className="bg-primary/10">
+              <CardTitle className="flex justify-between items-center">
+                <span>{player?.name || playerName} (You)</span>
+                <Heart className="h-5 w-5 text-red-500" />
+              </CardTitle>
+              <CardDescription>
+                <div className="flex items-center gap-2 mt-2">
+                  <Progress
+                    value={
+                      ((player?.health || 0) / (player?.maxHealth || 100)) * 100
+                    }
+                    className="h-4"
+                  />
+                  <span className="text-sm font-medium">
+                    {player?.health || 0}/{player?.maxHealth || 100}
+                  </span>
+                </div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Sword className="h-5 w-5 text-orange-500" />
+                  <span>Attack: {player?.attack || 15}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-blue-500" />
+                  <span>Defense: {player?.defense || 5}</span>
+                </div>
+                {player?.currentAttackType && (
+                  <div className="flex items-center gap-2">
+                    {getMoveTypeIcon(player.currentAttackType)}
+                    <span>
+                      Last Attack: {capitalize(player.currentAttackType)}
+                    </span>
+                  </div>
+                )}
+                {player?.currentDefenseType && (
+                  <div className="flex items-center gap-2">
+                    {getMoveTypeIcon(player.currentDefenseType)}
+                    <span>
+                      Last Defense: {capitalize(player.currentDefenseType)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            <div
+              className={cn(
+                "absolute inset-0 bg-red-500/20 pointer-events-none opacity-0",
+                attackAnimation === opponent?.id && "opacity-100"
+              )}
+            />
+          </Card>
+
+          {/* Opponent Card */}
+          <Card
+            className={cn(
+              "relative overflow-hidden",
+              attackAnimation === playerId && "animate-shake"
+            )}
+          >
+            <CardHeader className="bg-destructive/10">
+              <CardTitle className="flex justify-between items-center">
+                <span>{opponent?.name || "Opponent"}</span>
+                <Heart className="h-5 w-5 text-red-500" />
+              </CardTitle>
+              <CardDescription>
+                <div className="flex items-center gap-2 mt-2">
+                  <Progress
+                    value={
+                      ((opponent?.health || 0) / (opponent?.maxHealth || 100)) *
+                      100
+                    }
+                    className="h-4"
+                  />
+                  <span className="text-sm font-medium">
+                    {opponent?.health || 0}/{opponent?.maxHealth || 100}
+                  </span>
+                </div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Sword className="h-5 w-5 text-orange-500" />
+                  <span>Attack: {opponent?.attack || 15}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-blue-500" />
+                  <span>Defense: {opponent?.defense || 5}</span>
+                </div>
+                {opponent?.currentAttackType && (
+                  <div className="flex items-center gap-2">
+                    {getMoveTypeIcon(opponent.currentAttackType)}
+                    <span>
+                      Last Attack: {capitalize(opponent.currentAttackType)}
+                    </span>
+                  </div>
+                )}
+                {opponent?.currentDefenseType && (
+                  <div className="flex items-center gap-2">
+                    {getMoveTypeIcon(opponent.currentDefenseType)}
+                    <span>
+                      Last Defense: {capitalize(opponent.currentDefenseType)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            <div
+              className={cn(
+                "absolute inset-0 bg-red-500/20 pointer-events-none opacity-0",
+                attackAnimation === playerId && "opacity-100"
+              )}
+            />
+          </Card>
+        </div>
+
+        {/* Selection Phase UI - Modified to show only attack or defense */}
+        {gameState.phase === "selection" && isPlayerTurn && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {gameState.currentTurnType === "attack"
+                  ? "Choose Your Attack"
+                  : "Choose Your Defense"}
+              </CardTitle>
+              <CardDescription>
+                {gameState.currentTurnType === "attack"
+                  ? "Rock beats Scissors, Scissors beats Paper, Paper beats Rock"
+                  : `Defend against opponent's ${gameState.pendingAttack?.attackType} attack`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <h3 className="font-medium mb-3">
+                  {gameState.currentTurnType === "attack"
+                    ? "Attack Type:"
+                    : "Defense Type:"}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={localMoveType === "rock" ? "default" : "outline"}
+                    onClick={() => handleMoveSelect("rock")}
+                    className="flex items-center gap-2"
+                  >
+                    <Hand className="h-5 w-5" />
+                    Rock
+                  </Button>
+                  <Button
+                    variant={localMoveType === "paper" ? "default" : "outline"}
+                    onClick={() => handleMoveSelect("paper")}
+                    className="flex items-center gap-2"
+                  >
+                    <Scroll className="h-5 w-5" />
+                    Paper
+                  </Button>
+                  <Button
+                    variant={
+                      localMoveType === "scissors" ? "default" : "outline"
+                    }
+                    onClick={() => handleMoveSelect("scissors")}
+                    className="flex items-center gap-2"
+                  >
+                    <Scissors className="h-5 w-5" />
+                    Scissors
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                className="w-full mt-6"
+                disabled={!localMoveType}
+                onClick={handleConfirmMove}
+              >
+                Confirm{" "}
+                {gameState.currentTurnType === "attack" ? "Attack" : "Defense"}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Waiting for opponent's move */}
+        {gameState.phase === "selection" && !isPlayerTurn && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Waiting for Opponent</CardTitle>
+              <CardDescription>
+                {gameState.currentTurnType === "attack"
+                  ? `${opponent?.name || "Opponent"} is choosing their attack`
+                  : `${
+                      opponent?.name || "Opponent"
+                    } is choosing their defense against your ${
+                      gameState.pendingAttack?.attackType || ""
+                    } attack`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center py-8">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <p>
+                    {gameState.currentTurnType === "attack"
+                      ? "Get ready to defend once they choose their attack..."
+                      : "Waiting for opponent to choose their defense..."}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Game Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {gameState.phase === "game_over"
+                ? `Game Over! ${
+                    gameState.winner === playerId ? "You Won!" : "You Lost!"
+                  }`
+                : gameState.phase === "selection"
+                ? "Selection Phase"
+                : "Battle Phase"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-40 overflow-y-auto border rounded-md p-4">
+              {gameState.gameLog.map((log, index) => (
+                <p key={index} className="mb-1">
+                  {log}
+                </p>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            {gameState.phase === "game_over" && (
+              <Button
+                onClick={onExitGame}
+                variant="secondary"
+                className="w-full"
+              >
+                Return to Lobby
+              </Button>
+            )}
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 }
