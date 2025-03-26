@@ -1,7 +1,7 @@
 import type React from "react";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { SocketProvider } from "@/use-socket";
+import { SocketProvider } from "@hooks/use-socket";
 
 const inter = Inter({ subsets: ["latin"] });
 

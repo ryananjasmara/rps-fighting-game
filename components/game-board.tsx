@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/ui/button";
-import { Progress } from "@/ui/progress";
+import { Button } from "@components/ui/button";
+import { Progress } from "@components/ui/progress";
 import {
   Card,
   CardContent,
@@ -8,12 +8,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/ui/card";
-import { Badge } from "@/ui/badge";
+} from "@components/ui/card";
+import { Badge } from "@components/ui/badge";
 import { Shield, Sword, Heart, Hand, Scissors, Scroll } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { StickFigure } from "@/stick-figure";
-import { useSocket } from "@/use-socket";
+import { cn } from "@components/lib/utils";
+import { StickFigure } from "@components/stick-figure";
+import { useSocket } from "@hooks/use-socket";
 
 // Attack and defense types
 type MoveType = "rock" | "paper" | "scissors";
@@ -29,17 +29,18 @@ type Fighter = {
   currentDefenseType: MoveType | null;
 };
 
+// Action types for the stick figure animations
 type ActionType = "idle" | "attack" | "defend" | "hit" | "victory" | "defeat";
 
-// Menambahkan tipe turn untuk membedakan giliran serang dan bertahan
+// Adding turn type to differentiate between attack and defend turns
 type TurnType = "attack" | "defend";
 
 type GameState = {
   gameId: string;
   players: Fighter[];
   currentTurn: string | null;
-  currentTurnType: TurnType; // Menambahkan tipe giliran
-  pendingAttack: { playerId: string; attackType: MoveType } | null; // Menyimpan serangan yang tertunda
+  currentTurnType: TurnType;
+  pendingAttack: { playerId: string; attackType: MoveType } | null;
   phase: "waiting" | "selection" | "battle" | "game_over";
   winner: string | null;
   gameLog: string[];
@@ -62,7 +63,7 @@ export function GameBoard({
     gameId,
     players: [],
     currentTurn: null,
-    currentTurnType: "attack", // Default ke serangan untuk giliran pertama
+    currentTurnType: "attack",
     pendingAttack: null,
     phase: "waiting",
     winner: null,
@@ -99,11 +100,11 @@ export function GameBoard({
       }
     });
 
-    // Tambahkan log untuk event game_joined
+    // Add logging for game_joined event
     socket.on("game_joined", (data) => {
       console.log("Game joined event received:", data);
 
-      // Jika player B bergabung, minta update game state terbaru
+      // If player B joins, request the latest game state
       if (data.gameId === gameId) {
         console.log("Requesting game state update after joining");
         socket.emit("get_game_state", { gameId });
@@ -111,13 +112,7 @@ export function GameBoard({
     });
 
     socket.on("attack_animation", (data) => {
-      const {
-        attackerId,
-        defenderId,
-        attackType,
-        defenseType,
-        effectiveness: eff,
-      } = data;
+      const { attackerId, effectiveness: eff } = data;
 
       setAttackAnimation(attackerId);
 
@@ -152,7 +147,7 @@ export function GameBoard({
       }
     });
 
-    // Minta game state saat komponen dimount
+    // Request game state when component mounts
     console.log("Component mounted, requesting initial game state");
     socket.emit("get_game_state", { gameId });
 
@@ -178,7 +173,7 @@ export function GameBoard({
     )
       return;
 
-    // Kirim jenis gerakan berdasarkan tipe giliran saat ini
+    // Send move type based on current turn type
     if (gameState.currentTurnType === "attack") {
       socket.emit("submit_attack", {
         gameId,
@@ -206,7 +201,7 @@ export function GameBoard({
     }
   };
 
-  // PERBAIKAN: Jika socket belum terhubung, tampilkan layar loading
+  // IMPROVE: If socket is not connected, show loading screen
   if (!socket) {
     return (
       <Card>
@@ -226,8 +221,8 @@ export function GameBoard({
     );
   }
 
-  // PERBAIKAN: Ubah kondisi untuk menampilkan layar menunggu
-  // Hanya tampilkan layar menunggu jika fase permainan adalah "waiting"
+  // IMPROVE: Change condition to show waiting screen
+  // Show waiting screen only if game phase is "waiting"
   if (gameState.phase === "waiting") {
     return (
       <Card>
@@ -260,7 +255,7 @@ export function GameBoard({
     );
   }
 
-  // Mendapatkan teks status giliran
+  // Get turn status text
   const getTurnStatusText = () => {
     if (gameState.phase === "game_over") {
       return `Game Over! ${
@@ -281,23 +276,6 @@ export function GameBoard({
       : `Your Turn to Defend Against ${opponent?.name || "Opponent"}'s ${
           gameState.pendingAttack?.attackType || ""
         } Attack`;
-  };
-
-  // Mendapatkan teks instruksi untuk pemain
-  const getInstructionText = () => {
-    if (!isPlayerTurn) {
-      return gameState.currentTurnType === "attack"
-        ? "Waiting for opponent to choose their attack..."
-        : `Waiting for opponent to choose their defense against your ${
-            gameState.pendingAttack?.attackType || ""
-          } attack...`;
-    }
-
-    return gameState.currentTurnType === "attack"
-      ? "Choose your attack type"
-      : `Choose your defense type against opponent's ${
-          gameState.pendingAttack?.attackType || ""
-        } attack`;
   };
 
   return (
@@ -516,7 +494,7 @@ export function GameBoard({
         </Card>
       </div>
 
-      {/* Selection Phase UI - Dimodifikasi untuk menampilkan hanya serangan atau pertahanan */}
+      {/* Selection Phase UI - Modified to show only attack or defense */}
       {gameState.phase === "selection" && isPlayerTurn && (
         <Card className="mb-8">
           <CardHeader>

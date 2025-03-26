@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/ui/card";
-import { Lobby } from "@/lobby";
-import { GameBoard } from "@/game-board";
-import { useSocket } from "@/use-socket";
+import { Card, CardContent } from "@components/ui/card";
+import { Lobby } from "@components/lobby";
+import { GameBoard } from "@components/game-board";
+import { useSocket } from "@hooks/use-socket";
 
 export default function FightingGame() {
   const [gameState, setGameState] = useState<"lobby" | "game">("lobby");
@@ -29,12 +29,6 @@ export default function FightingGame() {
       console.log("Game joined event received in page.tsx:", data);
       setGameId(data.gameId);
       setGameState("game");
-
-      // Tambahkan delay kecil sebelum meminta game state
-      setTimeout(() => {
-        console.log("Requesting game state after joining game");
-        socket.emit("get_game_state", { gameId: data.gameId });
-      }, 500);
     });
 
     socket.on("error", (data) => {
@@ -74,10 +68,10 @@ export default function FightingGame() {
       playerId,
     });
 
-    // Reset state setelah meninggalkan game
+    // Reset state after leaving game
     setGameState("lobby");
     setGameId(null);
-    setError(null); // Reset error juga
+    setError(null);
     setPlayerId("");
     setPlayerName("");
   };

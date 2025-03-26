@@ -20,16 +20,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Gunakan URL socket server eksternal
-    // Pastikan ini mengarah ke socket server yang sudah Anda jalankan
+    // Use socket server from environment variable
     const socketUrl =
       process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
     console.log(`Connecting to socket server at ${socketUrl}`);
 
     const socketInstance = io(socketUrl, {
-      // Tambahkan opsi untuk menangani CORS jika diperlukan
       withCredentials: false,
-      transports: ["websocket", "polling"],
+      transports: ["websocket"],
     });
 
     socketInstance.on("connect", () => {

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@components/lib/utils";
 
 type MoveType = "rock" | "paper" | "scissors";
 

@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/ui/card";
-import { useSocket } from "@/use-socket";
+} from "@components/ui/card";
+import { useSocket } from "@hooks/use-socket";
 
 type LobbyProps = {
   playerName: string;
@@ -38,7 +38,7 @@ export function Lobby({
   useEffect(() => {
     if (!socket) return;
 
-    // Request available games when component mounts
+    // Request initial available games when component mounts
     socket.emit("get_available_games");
 
     // Listen for available games updates
@@ -46,14 +46,8 @@ export function Lobby({
       setAvailableGames(data.games);
     });
 
-    // Set up polling for available games
-    const interval = setInterval(() => {
-      socket.emit("get_available_games");
-    }, 5000);
-
     return () => {
       socket.off("available_games");
-      clearInterval(interval);
     };
   }, [socket]);
 
