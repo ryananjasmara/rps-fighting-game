@@ -8,18 +8,18 @@ import { useSocket } from "@hooks/use-socket";
 
 // Gunakan nama file yang eksplisit
 const GameBoard = dynamic(
-  () => import("../components/game-board").then((mod) => mod.GameBoard),
+  () => import("@components/game-board").then((mod) => mod.GameBoard),
   {
     ssr: false,
-    loading: () => <div>Loading...</div>,
+    loading: () => <div>Loading game...</div>,
   }
 );
 
 const GameBoardAI = dynamic(
-  () => import("../components/game-board-ai").then((mod) => mod.GameBoardAI),
+  () => import("@components/game-board-ai").then((mod) => mod.GameBoardAI),
   {
     ssr: false,
-    loading: () => <div>Loading...</div>,
+    loading: () => <div>Loading game...</div>,
   }
 );
 

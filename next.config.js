@@ -5,40 +5,31 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true, // Temporary fix
   },
-  webpack: (config, { isServer }) => {
-    // Optimize chunks
+  // Hapus assetPrefix karena bisa menyebabkan masalah loading
+  // assetPrefix: process.env.NODE_ENV === 'production' ? '/_next' : '',
+
+  // Pastikan images dan static files bisa diakses
+  images: {
+    domains: ['localhost', 'vercel.app'], // sesuaikan dengan domain Anda
+    unoptimized: true,
+  },
+
+  // Optimize chunks dengan lebih sederhana
+  webpack: (config) => {
     config.optimization.splitChunks = {
       chunks: 'all',
-      minSize: 20000,
-      maxSize: 70000,
       cacheGroups: {
         default: false,
         vendors: false,
-        // Vendor chunk
-        vendor: {
-          name: 'vendor',
+        commons: {
+          name: 'commons',
           chunks: 'all',
-          test: /node_modules/,
-          priority: 20,
-        },
-        // Common chunk
-        common: {
-          name: 'common',
           minChunks: 2,
-          chunks: 'all',
-          priority: 10,
           reuseExistingChunk: true,
-          enforce: true,
         },
       },
     };
     return config;
-  },
-  // Tambahkan ini untuk memastikan asset loading yang benar
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/_next' : '',
-  // Disable image optimization jika tidak digunakan
-  images: {
-    unoptimized: true,
   },
 }
 
