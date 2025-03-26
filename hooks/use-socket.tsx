@@ -31,6 +31,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     const socketInstance = io(socketUrl, {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      timeout: 10000,
     });
 
     socketInstance.on("connect", () => {

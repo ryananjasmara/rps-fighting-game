@@ -29,6 +29,9 @@ export default function FightingGame() {
   const [playerId, setPlayerId] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState(
+    "Connecting to server..."
+  );
 
   const { socket, isConnected } = useSocket();
 
@@ -57,6 +60,19 @@ export default function FightingGame() {
       socket.off("error");
     };
   }, [socket, playerId]);
+
+  useEffect(() => {
+    if (error) {
+      setConnectionStatus(`Connection error: ${error.message}`);
+      console.error("Socket error:", error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (socket?.connected) {
+      setConnectionStatus("Connected!");
+    }
+  }, [socket?.connected]);
 
   const handleCreateGame = () => {
     if (!socket || !playerName) return;
@@ -108,6 +124,8 @@ export default function FightingGame() {
       <h1 className="text-3xl font-bold text-center mb-8">
         Multiplayer Rock-Paper-Scissors Fighting Game
       </h1>
+
+      <p className="text-lg">{connectionStatus}</p>
 
       {error && (
         <Card className="mb-8 bg-red-50 border-red-200">
