@@ -23,9 +23,20 @@
             }
         ],
         "paths": {
-            "@/*": [
-                "./components/*",
+            "@hooks/*": [
                 "./hooks/*"
+            ],
+            "@components/*": [
+                "./components/*"
+            ],
+            "@ui/*": [
+                "./components/ui/*"
+            ],
+            "@lib/*": [
+                "./lib/*"
+            ],
+            "@utils/*": [
+                "./utils/*"
             ]
         }
     },
