@@ -14,12 +14,12 @@ export function HowToPlayModal() {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <HelpCircle className="w-4 h-4 mr-2" />
-          How to Play
+          Instructions
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>How to Play</DialogTitle>
+          <DialogTitle>Instructions</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <ul className="list-disc pl-5 space-y-2">

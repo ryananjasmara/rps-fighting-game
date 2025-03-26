@@ -84,7 +84,7 @@ export function Lobby({
 
         <Card>
           <CardHeader>
-            <CardTitle>Play with AI</CardTitle>
+            <CardTitle>Play with Bot</CardTitle>
             <CardDescription>Play against the computer</CardDescription>
           </CardHeader>
           <CardContent>
@@ -93,7 +93,7 @@ export function Lobby({
               disabled={!playerName}
               className="w-full"
             >
-              Play with AI
+              Play with Bot
             </Button>
           </CardContent>
         </Card>

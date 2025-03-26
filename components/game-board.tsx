@@ -283,7 +283,7 @@ export function GameBoard({
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Game Room: {gameId}</h1>
+        <h1 className="md:text-2xl font-bold">Room ID: {gameId}</h1>
         <div className="space-x-2 flex items-center gap-2">
           <HowToPlayModal />
           <Button variant="destructive" size="sm" onClick={onExitGame}>
@@ -298,8 +298,8 @@ export function GameBoard({
         </div>
 
         {/* Battle Arena */}
-        <div className="relative h-64 bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl overflow-hidden border">
-          <div className="absolute inset-0 flex items-center justify-between px-12">
+        <div className="relative h-48 sm:h-64 bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl overflow-hidden border">
+          <div className="absolute inset-0 flex items-center justify-between px-4 sm:px-12">
             {/* Player Stick Figure */}
             <div className="flex flex-col items-center">
               <StickFigure
@@ -307,16 +307,16 @@ export function GameBoard({
                 moveType={player?.currentAttackType || localMoveType || "rock"}
                 color="blue"
                 flipped={false}
-                className="h-40 w-40"
+                className="h-24 w-24 sm:h-40 sm:w-40"
               />
-              <div className="mt-2 w-32">
+              <div className="mt-2 w-20 sm:w-32">
                 <Progress
                   value={
                     ((player?.health || 0) / (player?.maxHealth || 100)) * 100
                   }
                   className="h-2"
                 />
-                <p className="text-xs text-center mt-1">
+                <p className="text-[10px] sm:text-xs text-center mt-1">
                   {player?.health || 0}/{player?.maxHealth || 100}
                 </p>
               </div>
@@ -326,7 +326,7 @@ export function GameBoard({
             {effectiveness && (
               <div
                 className={cn(
-                  "absolute top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-white font-bold",
+                  "absolute top-2 sm:top-4 left-1/2 transform -translate-x-1/2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-white font-bold text-xs sm:text-sm",
                   effectiveness === "super"
                     ? "bg-green-500"
                     : effectiveness === "normal"
@@ -343,7 +343,7 @@ export function GameBoard({
             )}
 
             {/* VS */}
-            <div className="text-4xl font-bold opacity-20">VS</div>
+            <div className="text-2xl sm:text-4xl font-bold opacity-20">VS</div>
 
             {/* Opponent Stick Figure */}
             <div className="flex flex-col items-center">
@@ -352,23 +352,117 @@ export function GameBoard({
                 moveType={opponent?.currentAttackType || "rock"}
                 color="red"
                 flipped={true}
-                className="h-40 w-40"
+                className="h-24 w-24 sm:h-40 sm:w-40"
               />
-              <div className="mt-2 w-32">
+              <div className="mt-2 w-20 sm:w-32">
                 <Progress
                   value={
                     ((opponent?.health || 0) / (opponent?.maxHealth || 100)) *
                     100
                   }
-                  className="h-2"
+                  className="h-1.5 sm:h-2"
                 />
-                <p className="text-xs text-center mt-1">
+                <p className="text-[10px] sm:text-xs text-center mt-1">
                   {opponent?.health || 0}/{opponent?.maxHealth || 100}
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Selection Phase UI - Modified to show only attack or defense for mobile */}
+        {gameState.phase === "selection" && isPlayerTurn && (
+          <Card className="block md:hidden">
+            <CardHeader>
+              <CardTitle>
+                {gameState.currentTurnType === "attack"
+                  ? "Choose Your Attack"
+                  : "Choose Your Defense"}
+              </CardTitle>
+              <CardDescription>
+                {gameState.currentTurnType === "attack"
+                  ? "Rock beats Scissors, Scissors beats Paper, Paper beats Rock"
+                  : `Defend against opponent's attack`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <h3 className="font-medium mb-3">
+                  {gameState.currentTurnType === "attack"
+                    ? "Attack Type:"
+                    : "Defense Type:"}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={localMoveType === "rock" ? "default" : "outline"}
+                    onClick={() => handleMoveSelect("rock")}
+                    className="flex items-center gap-2"
+                  >
+                    <Hand className="h-5 w-5" />
+                    Rock
+                  </Button>
+                  <Button
+                    variant={localMoveType === "paper" ? "default" : "outline"}
+                    onClick={() => handleMoveSelect("paper")}
+                    className="flex items-center gap-2"
+                  >
+                    <Scroll className="h-5 w-5" />
+                    Paper
+                  </Button>
+                  <Button
+                    variant={
+                      localMoveType === "scissors" ? "default" : "outline"
+                    }
+                    onClick={() => handleMoveSelect("scissors")}
+                    className="flex items-center gap-2"
+                  >
+                    <Scissors className="h-5 w-5" />
+                    Scissors
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                className="w-full mt-6"
+                disabled={!localMoveType}
+                onClick={handleConfirmMove}
+              >
+                Confirm{" "}
+                {gameState.currentTurnType === "attack" ? "Attack" : "Defense"}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Waiting for opponent's move for mobile */}
+        {gameState.phase === "selection" && !isPlayerTurn && (
+          <Card className="block md:hidden">
+            <CardHeader>
+              <CardTitle>Waiting for Opponent</CardTitle>
+              <CardDescription>
+                {gameState.currentTurnType === "attack"
+                  ? `${opponent?.name || "Opponent"} is choosing their attack`
+                  : `${
+                      opponent?.name || "Opponent"
+                    } is choosing their defense against your ${
+                      gameState.pendingAttack?.attackType || ""
+                    } attack`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center py-8">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <p>
+                    {gameState.currentTurnType === "attack"
+                      ? "Get ready to defend once they choose their attack..."
+                      : "Waiting for opponent to choose their defense..."}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Player Card */}
@@ -499,7 +593,7 @@ export function GameBoard({
 
         {/* Selection Phase UI - Modified to show only attack or defense */}
         {gameState.phase === "selection" && isPlayerTurn && (
-          <Card>
+          <Card className="hidden md:block">
             <CardHeader>
               <CardTitle>
                 {gameState.currentTurnType === "attack"
@@ -509,7 +603,7 @@ export function GameBoard({
               <CardDescription>
                 {gameState.currentTurnType === "attack"
                   ? "Rock beats Scissors, Scissors beats Paper, Paper beats Rock"
-                  : `Defend against opponent's ${gameState.pendingAttack?.attackType} attack`}
+                  : `Defend against opponent's attack`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -563,7 +657,7 @@ export function GameBoard({
 
         {/* Waiting for opponent's move */}
         {gameState.phase === "selection" && !isPlayerTurn && (
-          <Card>
+          <Card className="hidden md:block">
             <CardHeader>
               <CardTitle>Waiting for Opponent</CardTitle>
               <CardDescription>
