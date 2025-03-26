@@ -3,25 +3,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@components/ui/card";
 import { Lobby } from "@components/lobby";
-import dynamic from "next/dynamic";
+import { GameBoard } from "@components/game-board";
+import { GameBoardAI } from "@components/game-board-ai";
 import { useSocket } from "@hooks/use-socket";
-
-// Gunakan nama file yang eksplisit
-const GameBoard = dynamic(
-  () => import("@components/game-board").then((mod) => mod.GameBoard),
-  {
-    ssr: false,
-    loading: () => <div>Loading game...</div>,
-  }
-);
-
-const GameBoardAI = dynamic(
-  () => import("@components/game-board-ai").then((mod) => mod.GameBoardAI),
-  {
-    ssr: false,
-    loading: () => <div>Loading game...</div>,
-  }
-);
 
 export default function FightingGame() {
   const [gameState, setGameState] = useState<"lobby" | "game" | "ai">("lobby");
@@ -63,7 +47,7 @@ export default function FightingGame() {
 
   useEffect(() => {
     if (error) {
-      setConnectionStatus(`Connection error: ${error.message}`);
+      setConnectionStatus(`Connection error: ${error}`);
       console.error("Socket error:", error);
     }
   }, [error]);

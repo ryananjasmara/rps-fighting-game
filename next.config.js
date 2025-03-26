@@ -16,21 +16,35 @@ const nextConfig = {
 
   // Optimize chunks dengan lebih sederhana
   webpack: (config) => {
-    config.optimization.splitChunks = {
-      chunks: 'all',
-      cacheGroups: {
-        default: false,
-        vendors: false,
-        commons: {
-          name: 'commons',
-          chunks: 'all',
-          minChunks: 2,
-          reuseExistingChunk: true,
-        },
-      },
-    };
+    // Disable code splitting
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: false,
+      runtimeChunk: false
+    }
+
+    // Force all JavaScript into one file
+    config.optimization.minimize = true;
+    config.optimization.moduleIds = 'deterministic';
+
     return config;
   },
+
+  // Experimental features untuk optimasi
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['@components', '@hooks'],
+    turbotrace: {
+      logLevel: 'error',
+      logDetail: true,
+    },
+  },
+
+  // Compress responses
+  compress: true,
+
+  // Disable powered by header
+  poweredByHeader: false,
 }
 
 module.exports = nextConfig
