@@ -17,6 +17,7 @@ type LobbyProps = {
   setPlayerName: (name: string) => void;
   onCreateGame: () => void;
   onJoinGame: (gameId: string) => void;
+  onJoinAiGame: () => void;
 };
 
 type GameListing = {
@@ -30,6 +31,7 @@ export function Lobby({
   setPlayerName,
   onCreateGame,
   onJoinGame,
+  onJoinAiGame,
 }: LobbyProps) {
   const [gameIdToJoin, setGameIdToJoin] = useState("");
   const [availableGames, setAvailableGames] = useState<GameListing[]>([]);
@@ -53,31 +55,49 @@ export function Lobby({
 
   return (
     <div className="grid gap-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Player Setup</CardTitle>
-          <CardDescription>Enter your name to start playing</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div>
-              <label
-                htmlFor="playerName"
-                className="block text-sm font-medium mb-2"
-              >
-                Your Name
-              </label>
-              <Input
-                id="playerName"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full"
-              />
+      <div className="grid md:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Player Setup</CardTitle>
+            <CardDescription>Enter your name to start playing</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <div>
+                <label
+                  htmlFor="playerName"
+                  className="block text-sm font-medium mb-2"
+                >
+                  Your Name
+                </label>
+                <Input
+                  id="playerName"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="w-full"
+                />
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Play with AI</CardTitle>
+            <CardDescription>Play against the computer</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={onJoinAiGame}
+              disabled={!playerName}
+              className="w-full"
+            >
+              Play with AI
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-8">
         <Card>

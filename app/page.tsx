@@ -5,9 +5,10 @@ import { Card, CardContent } from "@components/ui/card";
 import { Lobby } from "@components/lobby";
 import { GameBoard } from "@components/game-board";
 import { useSocket } from "@hooks/use-socket";
+import { GameBoardAI } from "@components/game-board-ai";
 
 export default function FightingGame() {
-  const [gameState, setGameState] = useState<"lobby" | "game">("lobby");
+  const [gameState, setGameState] = useState<"lobby" | "game" | "ai">("lobby");
   const [gameId, setGameId] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
@@ -60,6 +61,16 @@ export default function FightingGame() {
     });
   };
 
+  const handleJoinAiGame = () => {
+    if (!playerName) return;
+
+    setGameState("ai");
+  };
+
+  const handleExitAiGame = () => {
+    setGameState("lobby");
+  };
+
   const handleExitGame = () => {
     if (!socket || !gameId) return;
 
@@ -107,6 +118,7 @@ export default function FightingGame() {
           setPlayerName={setPlayerName}
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}
+          onJoinAiGame={handleJoinAiGame}
         />
       )}
 
@@ -117,6 +129,10 @@ export default function FightingGame() {
           playerName={playerName}
           onExitGame={handleExitGame}
         />
+      )}
+
+      {gameState === "ai" && (
+        <GameBoardAI playerName={playerName} onExitGame={handleExitAiGame} />
       )}
     </div>
   );
