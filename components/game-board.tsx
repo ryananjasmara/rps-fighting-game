@@ -93,11 +93,6 @@ export function GameBoard({
     socket.on("game_state_update", (data: GameState) => {
       console.log("Game state update received:", data);
       setGameState(data);
-
-      // Reset local selections when it's a new turn
-      if (data.currentTurn === playerId) {
-        setLocalMoveType(null);
-      }
     });
 
     // Add logging for game_joined event
@@ -180,12 +175,18 @@ export function GameBoard({
         playerId,
         attackType: localMoveType,
       });
+
+      // Reset local move type after confirming attack
+      setLocalMoveType(null);
     } else {
       socket.emit("submit_defense", {
         gameId,
         playerId,
         defenseType: localMoveType,
       });
+
+      // Reset local move type after confirming defense
+      setLocalMoveType(null);
     }
   };
 
