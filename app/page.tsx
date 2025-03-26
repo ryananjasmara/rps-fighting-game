@@ -109,7 +109,7 @@ export default function FightingGame() {
         Multiplayer Rock-Paper-Scissors Fighting Game
       </h1>
 
-      <p className="text-lg">{connectionStatus}</p>
+      {/* <p className="text-lg">{connectionStatus}</p> */}
 
       {error && (
         <Card className="mb-8 bg-red-50 border-red-200">
