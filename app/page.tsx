@@ -3,9 +3,25 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@components/ui/card";
 import { Lobby } from "@components/lobby";
-import { GameBoard } from "@components/game-board";
+import dynamic from "next/dynamic";
 import { useSocket } from "@hooks/use-socket";
-import { GameBoardAI } from "@components/game-board-ai";
+
+// Gunakan nama file yang eksplisit
+const GameBoard = dynamic(
+  () => import("../components/game-board").then((mod) => mod.GameBoard),
+  {
+    ssr: false,
+    loading: () => <div>Loading...</div>,
+  }
+);
+
+const GameBoardAI = dynamic(
+  () => import("../components/game-board-ai").then((mod) => mod.GameBoardAI),
+  {
+    ssr: false,
+    loading: () => <div>Loading...</div>,
+  }
+);
 
 export default function FightingGame() {
   const [gameState, setGameState] = useState<"lobby" | "game" | "ai">("lobby");

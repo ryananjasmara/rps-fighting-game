@@ -3,21 +3,24 @@
 import type React from "react";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { io, type Socket } from "socket.io-client";
+import io, { type Socket } from "socket.io-client";
 
 type SocketContextType = {
   socket: Socket | null;
   isConnected: boolean;
+  error: Error | null;
 };
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   isConnected: false,
+  error: null,
 });
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     // Use socket server from environment variable
@@ -26,17 +29,19 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     console.log(`Connecting to socket server at ${socketUrl}`);
 
     const socketInstance = io(socketUrl, {
-      withCredentials: false,
-      transports: ["websocket"],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
 
     socketInstance.on("connect", () => {
       console.log("Connected to socket server");
       setIsConnected(true);
+      setSocket(socketInstance);
     });
 
     socketInstance.on("connect_error", (err) => {
-      console.error("Socket connection error:", err.message);
+      console.error("Socket connection error:", err);
+      setError(err);
       setIsConnected(false);
     });
 
@@ -45,17 +50,15 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setIsConnected(false);
     });
 
-    setSocket(socketInstance);
-
     // Clean up on unmount
     return () => {
       console.log("Cleaning up socket connection");
-      socketInstance.disconnect();
+      socketInstance.close();
     };
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected }}>
+    <SocketContext.Provider value={{ socket, isConnected, error }}>
       {children}
     </SocketContext.Provider>
   );

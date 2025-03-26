@@ -2,6 +2,7 @@ import type React from "react";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { SocketProvider } from "@hooks/use-socket";
+import { ErrorBoundary } from "@components/error-boundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,11 @@ export default function RootLayout({
   return (
     <html lang={"en"}>
       <body className={inter.className}>
-        <SocketProvider>{children}</SocketProvider>
+        <ErrorBoundary>
+          <SocketProvider>
+            {children}
+          </SocketProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
